@@ -13,7 +13,7 @@ paths:
           required: false
           schema:
             type: string
-        
+
       responses:
         "200":
           description: ""
@@ -40,19 +40,19 @@ paths:
                     example: 2
                   result:
                     $ref: "#/components/schemas/Movie"
-  
+
   /v1/movies/{id}:
     get:
       description: ""
       parameters:
         - in: path
-          name: id  
+          name: id
           required: true
           schema:
             type: string
             format: uuid
           description: ID кинопроизведения
-        
+
       responses:
         "200":
           description: ""
@@ -68,14 +68,14 @@ components:
         id:
           type: string
           format: uuid
-          description: ID 
+          description: ID
         title:
           type: string
-          description: Название 
+          description: Название
           example: Crescent Star
         description:
           type: string
-          description: Описание  
+          description: Описание
           example: In 1944, the Germans began rounding up the Jews of Rhodes.
         creation_date:
           type: string
@@ -119,5 +119,4 @@ components:
           items:
             type: string
             description: Имя сценариста
-            example: Drama                
-  
+            example: Drama
