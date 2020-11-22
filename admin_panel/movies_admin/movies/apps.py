@@ -8,4 +8,4 @@ class MoviesConfig(AppConfig):
 class AppsConfig():
 
     def ready(self):
-        import movies.signals
+        from . import signals
