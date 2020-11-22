@@ -1,9 +1,10 @@
 import uuid
-from config import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from model_utils.models import TimeStampedModel
+
+CONTENT_SCHEMA = "content"
 
 
 class Person(TimeStampedModel):
@@ -14,7 +15,7 @@ class Person(TimeStampedModel):
     class Meta:
         verbose_name = _("персона")
         verbose_name_plural = _("персоны")
-        db_table = f'{settings.dev.CONTENT_SCHEMA}"."person'
+        db_table = f'{CONTENT_SCHEMA}"."person'
 
     def __str__(self):
         return self.full_name
@@ -28,7 +29,7 @@ class Genre(TimeStampedModel):
     class Meta:
         verbose_name = _("жанр")
         verbose_name_plural = _("жанры")
-        db_table = f'{settings.dev.CONTENT_SCHEMA}"."genre'
+        db_table = f'{CONTENT_SCHEMA}"."genre'
 
     def __str__(self):
         return self.name
@@ -43,10 +44,12 @@ class FilmWork(TimeStampedModel):
     id = models.UUIDField(_("id"), primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(_("название"), max_length=255)
     description = models.TextField(_("описание"), blank=True)
-    creation_date = models.DateField(_("дата создания фильма"), null=True)
+    creation_date = models.DateField(_("дата создания фильма"), null=True, blank=True)
     certificate = models.TextField(_("сертификат"), blank=True)
-    file_path = models.FileField(_("файл"), upload_to="film_works/", null=True)
-    rating = models.FloatField(_("рейтинг"), validators=[MinValueValidator(0)], null=True)
+    file_path = models.FileField(_("файл"), upload_to="film_works/", null=True, blank=True)
+    rating = models.FloatField(
+        _("рейтинг"), validators=[MinValueValidator(0)], null=True, blank=True
+    )
     type = models.TextField(_("тип"), choices=FilmWorkType.choices, blank=True)
     genres = models.ManyToManyField("movies.Genre", through="movies.GenreFilmWork")
     persons = models.ManyToManyField("movies.Person", through="movies.PersonFilmWork")
@@ -54,7 +57,7 @@ class FilmWork(TimeStampedModel):
     class Meta:
         verbose_name = _("кинопроизведение")
         verbose_name_plural = _("кинопроизведения")
-        db_table = f'{settings.dev.CONTENT_SCHEMA}"."film_work'
+        db_table = f'{CONTENT_SCHEMA}"."film_work'
 
     def __str__(self):
         return self.title
@@ -76,7 +79,7 @@ class PersonFilmWork(models.Model):
     class Meta:
         verbose_name = _("участник кинопроизведение")
         verbose_name_plural = _("участники кинопроизведения")
-        db_table = f'{settings.dev.CONTENT_SCHEMA}"."person_film_work'
+        db_table = f'{CONTENT_SCHEMA}"."person_film_work'
         unique_together = ("film_work", "person", "role")
 
 
@@ -89,5 +92,5 @@ class GenreFilmWork(models.Model):
     class Meta:
         verbose_name = _("жанр кинопроизведение")
         verbose_name_plural = _("жанры кинопроизведения")
-        db_table = f'{settings.dev.CONTENT_SCHEMA}"."genre_film_work'
+        db_table = f'{CONTENT_SCHEMA}"."genre_film_work'
         unique_together = ("film_work", "genre")
