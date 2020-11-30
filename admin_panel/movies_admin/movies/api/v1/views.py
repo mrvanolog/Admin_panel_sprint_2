@@ -7,9 +7,9 @@ from django.views.generic.detail import BaseDetailView
 from movies.models import FilmWork
 
 
-class Movies(BaseListView):
+class MoviesApiMixin:
     model = FilmWork
-    http_method_names = ['get']  # Список методов, которые реализует обработчик
+    http_method_names = ["get"]  # Список методов, которые реализует обработчик
 
     def get_queryset(self):
         values = ("id", "title", "description", "creation_date", "rating", "type")
@@ -17,34 +17,48 @@ class Movies(BaseListView):
             actors=ArrayAgg(
                 "personfilmwork__person__full_name",
                 filter=Q(personfilmwork__role="actor"),
-                distinct=True
+                distinct=True,
             ),
             directors=ArrayAgg(
                 "personfilmwork__person__full_name",
                 filter=Q(personfilmwork__role="director"),
-                distinct=True
+                distinct=True,
             ),
             writers=ArrayAgg(
                 "personfilmwork__person__full_name",
                 filter=Q(personfilmwork__role="writer"),
-                distinct=True
+                distinct=True,
             ),
-            genres=ArrayAgg(
-                "genres__name",
-                distinct=True
-            ),
+            genres=ArrayAgg("genres__name", distinct=True),
         )
         return query
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = {
-            'results': list(self.get_queryset()),
-        }
-
-        return context
 
     def render_to_response(self, context, **response_kwargs):
         return JsonResponse(context)
 
-class MoviesDetail(BaseDetailView):
+
+class MoviesApi(MoviesApiMixin, BaseListView):
+    model = FilmWork
+    http_method_names = ["get"]
+
+    paginate_by = 50
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        queryset = self.get_queryset()
+        page_size = self.paginate_by
+
+        paginator, page, object_list, _ = self.paginate_queryset(queryset, page_size)
+
+        context = {
+            "count": paginator.count,
+            "total_pages": paginator.num_pages,
+            "prev": page.previous_page_number() if page.has_previous() else None,
+            "next": page.next_page_number() if page.has_next() else None,
+            "results": list(queryset),
+        }
+
+        return context
+
+
+class MoviesDetailApi(MoviesApiMixin, BaseDetailView):
     pass
