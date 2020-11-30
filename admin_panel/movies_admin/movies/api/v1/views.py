@@ -31,6 +31,7 @@ class MoviesApiMixin:
             ),
             genres=ArrayAgg("genres__name", distinct=True),
         )
+
         return query
 
     def render_to_response(self, context, **response_kwargs):
@@ -61,4 +62,12 @@ class MoviesApi(MoviesApiMixin, BaseListView):
 
 
 class MoviesDetailApi(MoviesApiMixin, BaseDetailView):
-    pass
+    model = FilmWork
+    http_method_names = ["get"]
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        pk = self.get_object()["id"]
+        context = super().get_context_data(kwargs={"pk": pk})
+        context = context["object"]
+
+        return context
