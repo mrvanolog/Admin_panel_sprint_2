@@ -25,7 +25,7 @@ SECRET_KEY = "3z21_q_q!*y_k0_)1igs6wdt=do^yu&6z&esi3^q4b8k9u(5hc"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "movies",
-    "debug_toolbar"
 ]
 
 MIDDLEWARE = [
@@ -86,7 +85,7 @@ DATABASES = {
         "NAME": "movies",
         "USER": "postgres",
         "PASSWORD": "123",
-        "HOST": "127.0.0.1",
+        "HOST": "db",
         "PORT": "5432",
     }
 }
