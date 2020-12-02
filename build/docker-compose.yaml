@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  # создаем контейнер для бд postgres
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 123
+      POSTGRES_USER: postgres
+      POSTGRES_DB: movies
+    # создаем схему content
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+  # создаем контейнер для web приложения на django
+  web:
+    build: django/.
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - /Users/mrvanolog/Dev/Praktikum/1_Admin_Panel/Admin_panel_sprint_2/admin_panel/movies_admin:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  etl:
+    build: etl/.
+    command: python ./load_data.py
+    volumes:
+      - /Users/mrvanolog/Dev/Praktikum/1_Admin_Panel/Admin_panel_sprint_2/admin_panel/sqlite_to_postgres:/code
+    depends_on:
+      - db
+      - web
