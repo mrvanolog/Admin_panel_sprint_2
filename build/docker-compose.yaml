@@ -11,21 +11,33 @@ services:
     # создаем схему content
     volumes:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
   # создаем контейнер для web приложения на django
   web:
     build: django/.
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver localhost:8000
     volumes:
       - /Users/mrvanolog/Dev/Praktikum/1_Admin_Panel/Admin_panel_sprint_2/admin_panel/movies_admin:/code
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     depends_on:
       - db
-  etl:
-    build: etl/.
-    command: python ./load_data.py
+
+  nginx:
+    image: nginx:1.19.2
     volumes:
-      - /Users/mrvanolog/Dev/Praktikum/1_Admin_Panel/Admin_panel_sprint_2/admin_panel/sqlite_to_postgres:/code
+      - ./nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/config/conf.d:/etc/nginx/conf.d:ro
     depends_on:
-      - db
       - web
+    ports:
+      - "80:80"
+
+      # etl:
+  #   build: etl/.
+  #   command: python ./load_data.py
+  #   volumes:
+  #     - /Users/mrvanolog/Dev/Praktikum/1_Admin_Panel/Admin_panel_sprint_2/admin_panel/sqlite_to_postgres:/code
+  #   depends_on:
+  #     - db
+  #     - web
