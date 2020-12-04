@@ -6,10 +6,6 @@ services:
     restart: always
     env_file:
       - ./postgres/postgres.env
-    # environment:
-    #   POSTGRES_PASSWORD: 123
-    #   POSTGRES_USER: postgres
-    #   POSTGRES_DB: movies
     ports:
       - "5432:5432"
     # создаем схему content
