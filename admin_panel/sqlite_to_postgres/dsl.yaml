@@ -1,5 +1,5 @@
 dbname: "movies"
 user: "postgres"
-host: "localhost"
-port: 5432
-password: 123
+host: "db"
+port: "5432"
+password: "123"
