@@ -1,0 +1,49 @@
+version: "3.8"
+services:
+  # создаем контейнер для бд postgres
+  db:
+    image: postgres
+    restart: always
+    expose:
+      - "5432"
+    env_file:
+      - ./build/postgres/postgres.env
+    # создаем схему content
+    volumes:
+      - ./build/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # создаем контейнер для web приложения на django
+  web:
+    build: ./movies_admin/.
+    command: >
+      bash -c "sleep 5
+      && python manage.py migrate
+      && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - static_data:/var/movies/static
+    expose:
+      - "8000"
+    depends_on:
+      - db
+
+  upload_data:
+    build: ./sqlite_to_postgres/.
+    command: >
+      bash -c "sleep 15
+      && python load_data.py"
+    depends_on:
+      - db
+      - web
+
+  # создаем сервер на nginx
+  nginx:
+    build: ./build/nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    volumes:
+      - static_data:/var/movies/static
+
+volumes:
+  static_data:
